@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ShopEase</title>
+  <link href="style.css" rel="stylesheet">
+  <link rel="stylesheet" href="animation.css">
+</head>
+<body>
+
+<header>
+  <span style="font-size:20px; font-weight:bold;">ShopEase</span>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 Cart <span class="badge" id="cartCount">0</span>
+  </button>
+</header>
+
+<div class="product-grid" id="productGrid"></div>
+
+<!-- Cart panel -->
+<div class="cart-panel" id="cartPanel">
+  <h2>Your Cart</h2>
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal"></div>
+  <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>Checkout</button>
+  <button class="close-btn" onclick="toggleCart()">Close</button>
+</div>
+
+<!-- Order confirmed overlay -->
+<div class="overlay" id="orderOverlay">
+  <div class="order-box">
+    <div style="font-size:50px;">📦</div>
+    <h2>Order Confirmed!</h2>
+    <div class="on-the-way">🚚 Your order is on the way!</div>
+    <p style="color:#555; font-size:14px;">Estimated delivery: 2–4 business days</p>
+    <div class="order-items" id="orderItems"></div>
+    <div class="order-total" id="orderTotal"></div>
+    <button class="done-btn" onclick="dismissOrder()">Continue Shopping</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
