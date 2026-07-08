@@ -1,0 +1,78 @@
+        
+        body{
+            font-family: Arial;
+            background-color: #f0f0f0;
+            margin: 10px;
+            text-align:center;
+            border:10px solid #1e57a1;
+            border-radius:5em;
+        }
+
+        .mainBox{
+            background-color: white;
+            padding: 20px;
+            border-radius: 5em;
+            justify-self:center;
+            overflow-x:hidden;
+        }
+
+        h1{
+            color: darkblue;
+        }
+
+        .profile{
+            margin-bottom: 20px;
+            justify-self: center;
+            border:5px solid #1e57a1;
+            padding:20px;
+            border-radius: 5em;
+            width:50em;
+            text-align:center;
+            background-color:#f8c33ec5;
+            position:relative;
+            
+        }
+
+        img{
+            width: 20em;
+            border-radius: 5em;
+        }
+
+        input, textarea{
+            width: 250px;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        button{
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius:3em;
+            width:7em;
+        }
+
+        a{
+            color: green;
+            text-decoration: none;
+        }
+
+        a:hover{
+            color: red;
+        }
+
+        .contact{
+            border:5px solid #1e57a1;
+            width:53em;
+            min-height: 10em;
+            justify-self:center;
+            border-radius: 5em;
+            background-color: aquamarine;
+        }
+
+
+
+        
