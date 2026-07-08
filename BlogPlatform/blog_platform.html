@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--ink:#0F1117;--parchment:#F7F3EE;--accent:#C8841A;--accent-lt:#FDF3E0;
+--sage:#5C7A62;--sage-lt:#EDF3EE;--muted:#7A7670;--border:#E2DDD7;
+--white:#FFFFFF;--danger:#C0392B;--danger-lt:#FDE8E6;
+--card-shadow:0 1px 4px rgba(15,17,23,0.08);
+--serif:'Playfair Display',Georgia,serif;
+--sans:'Inter',system-ui,sans-serif;
+}
+body{font-family:var(--sans);background:var(--parchment);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+h1,h2,h3,h4{font-family:var(--serif)}
+
+/* TOPBAR */
+#topbar{background:var(--ink);color:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:52px;position:sticky;top:0;z-index:100}
+.tb-brand{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--white);cursor:pointer;letter-spacing:-.3px}
+.tb-brand span{color:var(--accent)}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-user{display:flex;align-items:center;gap:8px;font-size:13px;color:#ccc}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--white)}
+.btn{font-family:var(--sans);cursor:pointer;border:none;border-radius:6px;font-size:13px;font-weight:500;padding:7px 16px;transition:all .18s}
+.btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.3)}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-accent{background:var(--accent);color:var(--white)}
+.btn-accent:hover{background:#B5741A}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--border)}
+.btn-outline:hover{background:var(--border)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#a93226}
+.btn-sage{background:var(--sage);color:#fff}
+.btn-sage:hover{background:#4e6a54}
+
+/* LAYOUT */
+#app{display:none}
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:20px}
+.auth-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:36px 40px;width:100%;max-width:420px;box-shadow:var(--card-shadow)}
+.auth-card h2{font-size:24px;margin-bottom:6px}
+.auth-card .sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:14px;background:var(--white);color:var(--ink);outline:none;transition:border .15s}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:90px}
+.auth-toggle{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.auth-toggle span{color:var(--accent);cursor:pointer;font-weight:500}
+.auth-toggle span:hover{text-decoration:underline}
+.err-msg{background:var(--danger-lt);color:var(--danger);border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:14px;display:none}
+.success-msg{background:var(--sage-lt);color:var(--sage);border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:14px;display:none}
+
+/* MAIN LAYOUT */
+#main-layout{max-width:1100px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:1fr 310px;gap:28px}
+@media(max-width:760px){#main-layout{grid-template-columns:1fr}}
+
+/* POST CARDS */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-title{font-size:18px;font-weight:700;font-family:var(--serif)}
+.post-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:22px 24px;margin-bottom:14px;box-shadow:var(--card-shadow);cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;border-left:4px solid transparent}
+.post-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,17,23,0.1)}
+.post-card.cat-tech{border-left-color:#2980b9}
+.post-card.cat-life{border-left-color:var(--sage)}
+.post-card.cat-opinion{border-left-color:var(--accent)}
+.post-card.cat-tutorial{border-left-color:#8e44ad}
+.post-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.cat-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;padding:3px 8px;border-radius:4px}
+.cat-tech{background:#EBF3FB;color:#1a6fa8}
+.cat-life{background:var(--sage-lt);color:var(--sage)}
+.cat-opinion{background:var(--accent-lt);color:var(--accent)}
+.cat-tutorial{background:#F3EBF9;color:#6c3483}
+.post-time{font-size:12px;color:var(--muted)}
+.post-author{font-size:12px;color:var(--muted);font-weight:500}
+.post-card h3{font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.35;font-family:var(--serif)}
+.post-card p.excerpt{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.post-footer{display:flex;align-items:center;justify-content:space-between}
+.comment-count{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.post-actions{display:flex;gap:6px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--ink);font-family:var(--serif)}
+.empty-state p{font-size:13px}
+
+/* SIDEBAR */
+.sidebar-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:var(--card-shadow)}
+.sidebar-card h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:14px}
+.user-info{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.user-info .avatar{width:40px;height:40px;font-size:15px}
+.user-info-text .name{font-weight:600;font-size:14px}
+.user-info-text .email{font-size:12px;color:var(--muted)}
+.stat-row{display:flex;justify-content:space-between;margin-bottom:16px}
+.stat-box{text-align:center;flex:1}
+.stat-box .num{font-size:22px;font-weight:700;font-family:var(--serif);color:var(--ink)}
+.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.filter-btn{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:7px 10px;border-radius:6px;font-size:13px;font-family:var(--sans);color:var(--ink);transition:background .15s;margin-bottom:2px}
+.filter-btn:hover{background:var(--parchment)}
+.filter-btn.active{background:var(--accent-lt);color:var(--accent);font-weight:600}
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+
+/* MODAL OVERLAY */
+.modal-bg{position:fixed;inset:0;background:rgba(15,17,23,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:12px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;padding:32px 36px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);line-height:1}
+.modal-close:hover{color:var(--ink)}
+.modal h2{font-size:22px;margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* POST DETAIL */
+#post-detail{display:none;max-width:760px;margin:0 auto;padding:28px 20px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:22px;border:none;background:none;font-family:var(--sans)}
+.back-btn:hover{color:var(--ink)}
+.detail-header{margin-bottom:22px}
+.detail-header h1{font-size:30px;font-weight:700;line-height:1.25;margin-bottom:12px;font-family:var(--serif)}
+.detail-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:16px}
+.detail-body{font-size:15px;line-height:1.8;color:#2c2a27;margin-bottom:32px;white-space:pre-wrap}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+.comments-section h3{font-size:18px;font-weight:700;font-family:var(--serif);margin-bottom:18px}
+.comment-form{background:var(--parchment);border-radius:10px;padding:18px;margin-bottom:22px}
+.comment-form textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:13px;resize:vertical;min-height:72px;outline:none;background:var(--white)}
+.comment-form textarea:focus{border-color:var(--accent)}
+.comment-form-footer{display:flex;justify-content:flex-end;margin-top:10px}
+.comment{display:flex;gap:12px;margin-bottom:18px}
+.comment-avatar{width:34px;height:34px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.comment-bubble{flex:1;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.comment-author{font-weight:600;font-size:13px;margin-bottom:2px}
+.comment-time{font-size:11px;color:var(--muted);margin-bottom:6px}
+.comment-text{font-size:13px;line-height:1.6;color:var(--ink)}
+.comment-del{float:right;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;margin-left:8px}
+.comment-del:hover{color:var(--danger)}
+.no-comments{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.own-badge{font-size:10px;background:var(--accent-lt);color:var(--accent);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:500}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="tb-brand" onclick="goHome()">Ink<span>&</span>Thought</div>
+  <div class="tb-right">
+    <div id="auth-btns" style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="showAuth('login')">Sign in</button>
+      <button class="btn btn-accent btn-sm" onclick="showAuth('register')">Join free</button>
+    </div>
+    <div id="user-btns" style="display:none;display:flex;gap:10px;align-items:center">
+      <div class="tb-user">
+        <div class="avatar" id="nav-avatar"></div>
+        <span id="nav-name"></span>
+      </div>
+      <button class="btn btn-accent btn-sm" onclick="openNewPost()">+ New post</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h2 id="auth-title">Welcome back</h2>
+    <p class="sub" id="auth-sub">Sign in to read, write, and connect.</p>
+    <div class="err-msg" id="auth-err"></div>
+    <div class="success-msg" id="auth-ok"></div>
+    <div class="field"><label>Email</label><input type="email" id="auth-email" placeholder="you@example.com"></div>
+    <div class="field" id="auth-name-field" style="display:none"><label>Display name</label><input type="text" id="auth-name" placeholder="Your name"></div>
+    <div class="field"><label>Password</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
+    <button class="btn btn-accent" style="width:100%;padding:10px" id="auth-submit-btn" onclick="authSubmit()">Sign in</button>
+    <div class="auth-toggle" id="auth-toggle">Don't have an account? <span onclick="switchAuth()">Join free</span></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div id="main-layout">
+    <div id="feed-col">
+      <div class="section-header">
+        <div class="section-title" id="feed-title">Latest posts</div>
+        <div id="feed-subtitle" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+      <div id="post-list"></div>
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-card">
+        <h4>Your profile</h4>
+        <div class="user-info">
+          <div class="avatar" id="sidebar-avatar" style="width:40px;height:40px;font-size:15px"></div>
+          <div class="user-info-text">
+            <div class="name" id="sidebar-name"></div>
+            <div class="email" id="sidebar-email"></div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="num" id="stat-posts">0</div><div class="lbl">Posts</div></div>
+          <div class="stat-box"><div class="num" id="stat-comments">0</div><div class="lbl">Comments</div></div>
+          <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">Total posts</div></div>
+        </div>
+        <button class="btn btn-outline" style="width:100%;font-size:13px" onclick="openNewPost()">Write a new post</button>
+      </div>
+      <div class="sidebar-card">
+        <h4>Filter by category</h4>
+        <button class="filter-btn active" onclick="setFilter('all',this)"><span class="cat-dot" style="background:#666"></span>All posts</button>
+        <button class="filter-btn" onclick="setFilter('tech',this)"><span class="cat-dot" style="background:#2980b9"></span>Technology</button>
+        <button class="filter-btn" onclick="setFilter('life',this)"><span class="cat-dot" style="background:#5C7A62"></span>Lifestyle</button>
+        <button class="filter-btn" onclick="setFilter('opinion',this)"><span class="cat-dot" style="background:#C8841A"></span>Opinion</button>
+        <button class="filter-btn" onclick="setFilter('tutorial',this)"><span class="cat-dot" style="background:#8e44ad"></span>Tutorial</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL VIEW -->
+<div id="post-detail">
+  <button class="back-btn" onclick="backToFeed()">&#8592; Back to feed</button>
+  <div class="detail-header">
+    <div class="post-meta" id="detail-meta"></div>
+    <h1 id="detail-title"></h1>
+    <div class="detail-meta" id="detail-info"></div>
+    <div id="detail-owner-actions" style="display:none;gap:8px;display:none"></div>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+  <hr class="divider">
+  <div class="comments-section">
+    <h3 id="comments-heading">Comments</h3>
+    <div class="comment-form" id="comment-form">
+      <textarea id="comment-input" placeholder="Share your thoughts..."></textarea>
+      <div class="comment-form-footer">
+        <button class="btn btn-accent btn-sm" onclick="submitComment()">Post comment</button>
+      </div>
+    </div>
+    <div id="comments-list"></div>
+  </div>
+</div>
+
+<!-- NEW/EDIT POST MODAL -->
+<div class="modal-bg" id="post-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('post-modal')">&#215;</button>
+    <h2 id="post-modal-title">Write a new post</h2>
+    <div class="err-msg" id="post-err"></div>
+    <input type="hidden" id="edit-post-id">
+    <div class="field"><label>Title</label><input type="text" id="post-title" placeholder="An interesting headline..."></div>
+    <div class="field">
+      <label>Category</label>
+      <select id="post-cat" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:14px;background:var(--white);color:var(--ink);outline:none">
+        <option value="tech">Technology</option>
+        <option value="life">Lifestyle</option>
+        <option value="opinion">Opinion</option>
+        <option value="tutorial">Tutorial</option>
+      </select>
+    </div>
+    <div class="field"><label>Content</label><textarea id="post-body" placeholder="Write your post here..." style="min-height:180px"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('post-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="savePost()">Publish post</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-bg" id="delete-modal">
+  <div class="modal" style="max-width:380px">
+    <button class="modal-close" onclick="closeModal('delete-modal')">&#215;</button>
+    <h2 style="font-size:18px;margin-bottom:10px">Delete this post?</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This will permanently delete the post and all its comments. This can't be undone.</p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete post</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = {
+  mode: 'auth',
+  authMode: 'login',
+  currentUser: null,
+  currentFilter: 'all',
+  viewingPostId: null,
+  deletingPostId: null,
+  users: [
+    {id:'u1',name:'Alice Chen',email:'alice@example.com',pass:'alice123'},
+    {id:'u2',name:'Marcus Webb',email:'marcus@example.com',pass:'marcus123'},
+  ],
+  posts: [
+    {id:'p1',title:'Why Electron is perfect for cross-platform desktop apps',body:'Electron has transformed how we build desktop applications. By combining Chromium and Node.js, it lets web developers build native-feeling apps using the same skills they use every day.\n\nThe beauty of Electron lies in its simplicity. You write HTML, CSS, and JavaScript — and you get a desktop app for Windows, macOS, and Linux. No platform-specific code, no new languages to learn.\n\nOf course, it has trade-offs. The bundle size is larger than native apps since Chromium is bundled in. Memory usage is higher. But for productivity tools, dev tools, and internal apps, these trade-offs are almost always worth it.\n\nApps like VS Code, Slack, Figma, Notion, and Discord all run on Electron. That says a lot about its production-readiness.',cat:'tech',author:'u1',authorName:'Alice Chen',ts:Date.now()-86400000*3,comments:[]},
+    {id:'p2',title:'The art of writing a blog post people actually finish reading',body:'Most blog posts are abandoned within the first paragraph. Why? Because they promise something in the headline and immediately disappoint with a wall of preamble.\n\nHere is the single most important rule: start with your best idea. Not a definition, not a history lesson, not "In today\'s fast-paced world..." — your actual, interesting, specific idea.\n\nThe second rule is rhythm. Long sentences build tension. Short ones release it. Vary them. Mix technical depth with plain language. Give readers a reason to stay at the end of every paragraph.\n\nFinally, earn your ending. Don\'t summarize what you just said. Leave the reader with something they\'ll think about later.',cat:'opinion',author:'u2',authorName:'Marcus Webb',ts:Date.now()-86400000*1,comments:[
+      {id:'c1',text:'This completely changed how I approach writing. The "start with your best idea" rule is so obvious in hindsight!',author:'u1',authorName:'Alice Chen',ts:Date.now()-86400000*.5}
+    ]},
+    {id:'p3',title:'Local Storage vs IndexedDB: choosing the right client-side store',body:'When you need to persist data in a browser app without a server, you have two main options: localStorage and IndexedDB.\n\nLocalStorage is simple: key-value pairs, synchronous, up to ~5MB. Great for user preferences, settings, or small amounts of string data. The catch? Blocking — every read/write blocks the main thread.\n\nIndexedDB is a full object store: asynchronous, supports complex queries, stores structured data, up to gigabytes. The trade-off is API complexity. You need to work with transactions, cursors, and event-driven callbacks.\n\nFor most UI Lab projects, localStorage is plenty. For offline-capable apps, media caches, or large datasets, reach for IndexedDB or a wrapper like Dexie.js.',cat:'tutorial',author:'u1',authorName:'Alice Chen',ts:Date.now()-86400000*5,comments:[
+      {id:'c2',text:'Dexie.js is a game-changer. The localStorage-like API on top of IndexedDB is so much nicer to work with.',author:'u2',authorName:'Marcus Webb',ts:Date.now()-86400000*4.5},
+      {id:'c3',text:'Great breakdown! What about sessionStorage? Worth mentioning it is cleared when the tab closes.',author:'u1',authorName:'Alice Chen',ts:Date.now()-86400000*4}
+    ]},
+  ]
+};
+
+function uid(){return 'x'+Math.random().toString(36).slice(2,9)}
+function initials(name){return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+function timeAgo(ts){
+  const d=(Date.now()-ts)/1000;
+  if(d<60)return 'just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+}
+function catLabel(c){return{tech:'Technology',life:'Lifestyle',opinion:'Opinion',tutorial:'Tutorial'}[c]||c}
+function show(id){document.getElementById(id).style.display=''}
+function hide(id){document.getElementById(id).style.display='none'}
+
+// AUTH
+function showAuth(mode){
+  state.authMode=mode;
+  hide('app'); hide('post-detail');
+  show('auth-screen');
+  document.getElementById('auth-title').textContent=mode==='login'?'Welcome back':'Create an account';
+  document.getElementById('auth-sub').textContent=mode==='login'?'Sign in to read, write, and connect.':'Join the community and start writing.';
+  document.getElementById('auth-name-field').style.display=mode==='register'?'':'none';
+  document.getElementById('auth-submit-btn').textContent=mode==='login'?'Sign in':'Create account';
+  document.getElementById('auth-toggle').innerHTML=mode==='login'?`Don't have an account? <span onclick="switchAuth()">Join free</span>`:`Already have an account? <span onclick="switchAuth()">Sign in</span>`;
+  document.getElementById('auth-err').style.display='none';
+  document.getElementById('auth-ok').style.display='none';
+}
+function switchAuth(){showAuth(state.authMode==='login'?'register':'login')}
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display=''}
+function authSubmit(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  document.getElementById('auth-err').style.display='none';
+  if(!email||!pass){showErr('auth-err','Please fill in all fields.');return}
+  if(state.authMode==='login'){
+    const u=state.users.find(x=>x.email===email&&x.pass===pass);
+    if(!u){showErr('auth-err','Incorrect email or password.');return}
+    loginUser(u);
+  } else {
+    const name=document.getElementById('auth-name').value.trim();
+    if(!name){showErr('auth-err','Please enter a display name.');return}
+    if(state.users.find(x=>x.email===email)){showErr('auth-err','That email is already registered.');return}
+    const u={id:uid(),name,email,pass};
+    state.users.push(u);
+    loginUser(u);
+  }
+}
+function loginUser(u){
+  state.currentUser=u;
+  document.getElementById('auth-btns').style.display='none';
+  document.getElementById('user-btns').style.display='flex';
+  document.getElementById('nav-avatar').textContent=initials(u.name);
+  document.getElementById('nav-name').textContent=u.name;
+  document.getElementById('sidebar-avatar').textContent=initials(u.name);
+  document.getElementById('sidebar-name').textContent=u.name;
+  document.getElementById('sidebar-email').textContent=u.email;
+  hide('auth-screen');
+  showFeed();
+}
+function logout(){
+  state.currentUser=null;
+  document.getElementById('auth-btns').style.display='flex';
+  document.getElementById('user-btns').style.display='none';
+  hide('app'); hide('post-detail');
+  showAuth('login');
+}
+
+// FEED
+function goHome(){if(state.currentUser)showFeed();else showAuth('login')}
+function showFeed(){
+  hide('post-detail');
+  show('app');
+  state.viewingPostId=null;
+  renderFeed();
+}
+function setFilter(cat,btn){
+  state.currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('feed-title').textContent=cat==='all'?'Latest posts':catLabel(cat)+' posts';
+  renderFeed();
+}
+function renderFeed(){
+  const u=state.currentUser;
+  const posts=state.posts.filter(p=>state.currentFilter==='all'||p.cat===state.currentFilter).sort((a,b)=>b.ts-a.ts);
+  const myPosts=state.posts.filter(p=>p.author===u.id).length;
+  const myComments=state.posts.reduce((s,p)=>s+p.comments.filter(c=>c.author===u.id).length,0);
+  document.getElementById('stat-posts').textContent=myPosts;
+  document.getElementById('stat-comments').textContent=myComments;
+  document.getElementById('stat-total').textContent=state.posts.length;
+  const list=document.getElementById('post-list');
+  if(posts.length===0){
+    list.innerHTML=`<div class="empty-state"><h3>No posts yet</h3><p>Be the first to write in this category.</p></div>`;
+    return;
+  }
+  list.innerHTML=posts.map(p=>{
+    const isOwner=p.author===u.id;
+    return`<div class="post-card cat-${p.cat}" onclick="openPost('${p.id}')">
+      <div class="post-meta">
+        <span class="cat-badge cat-${p.cat}">${catLabel(p.cat)}</span>
+        <span class="post-author">${p.authorName}${isOwner?'<span class="own-badge">You</span>':''}</span>
+        <span class="post-time">${timeAgo(p.ts)}</span>
+      </div>
+      <h3>${p.title}</h3>
+      <p class="excerpt">${p.body.slice(0,160).replace(/\n/g,' ')}${p.body.length>160?'…':''}</p>
+      <div class="post-footer">
+        <div class="comment-count">&#128172; ${p.comments.length} comment${p.comments.length!==1?'s':''}</div>
+        ${isOwner?`<div class="post-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-outline btn-sm" onclick="openEditPost('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete('${p.id}')">Delete</button>
+        </div>`:''}
+      </div>
+    </div>`
+  }).join('');
+}
+
+// POST DETAIL
+function openPost(id){
+  const p=state.posts.find(x=>x.id===id);
+  if(!p)return;
+  state.viewingPostId=id;
+  hide('app');
+  show('post-detail');
+  const isOwner=p.author===state.currentUser.id;
+  document.getElementById('detail-meta').innerHTML=`<span class="cat-badge cat-${p.cat}">${catLabel(p.cat)}</span>`;
+  document.getElementById('detail-title').textContent=p.title;
+  document.getElementById('detail-info').innerHTML=`<span>By <strong>${p.authorName}</strong></span><span>${timeAgo(p.ts)}</span><span>&#128172; ${p.comments.length} comments</span>`;
+  const oa=document.getElementById('detail-owner-actions');
+  if(isOwner){
+    oa.style.display='flex';
+    oa.innerHTML=`<button class="btn btn-outline btn-sm" onclick="openEditPost('${p.id}')">Edit post</button><button class="btn btn-danger btn-sm" onclick="askDelete('${p.id}')">Delete post</button>`;
+  } else {
+    oa.style.display='none';
+  }
+  document.getElementById('detail-body').textContent=p.body;
+  document.getElementById('comment-input').value='';
+  renderComments(p);
+}
+function renderComments(p){
+  const u=state.currentUser;
+  document.getElementById('comments-heading').textContent=`${p.comments.length} Comment${p.comments.length!==1?'s':''}`;
+  const list=document.getElementById('comments-list');
+  if(p.comments.length===0){
+    list.innerHTML='<div class="no-comments">No comments yet. Be the first!</div>';return;
+  }
+  list.innerHTML=p.comments.map(c=>`
+    <div class="comment">
+      <div class="comment-avatar" style="background:${c.author===u.id?'var(--accent)':'var(--sage)'}">${initials(c.authorName)}</div>
+      <div class="comment-bubble">
+        <span class="comment-author">${c.authorName}${c.author===u.id?'<span class="own-badge">You</span>':''}</span>
+        ${c.author===u.id?`<button class="comment-del" onclick="deleteComment('${p.id}','${c.id}')">Delete</button>`:''}
+        <div class="comment-time">${timeAgo(c.ts)}</div>
+        <div class="comment-text">${c.text}</div>
+      </div>
+    </div>`).join('');
+}
+function backToFeed(){showFeed()}
+function submitComment(){
+  const text=document.getElementById('comment-input').value.trim();
+  if(!text)return;
+  const p=state.posts.find(x=>x.id===state.viewingPostId);
+  if(!p)return;
+  p.comments.push({id:uid(),text,author:state.currentUser.id,authorName:state.currentUser.name,ts:Date.now()});
+  document.getElementById('comment-input').value='';
+  renderComments(p);
+  document.getElementById('detail-info').innerHTML=`<span>By <strong>${p.authorName}</strong></span><span>${timeAgo(p.ts)}</span><span>&#128172; ${p.comments.length} comments</span>`;
+}
+function deleteComment(pid,cid){
+  const p=state.posts.find(x=>x.id===pid);
+  if(!p)return;
+  p.comments=p.comments.filter(c=>c.id!==cid);
+  renderComments(p);
+}
+
+// POST CRUD
+function openNewPost(){
+  document.getElementById('edit-post-id').value='';
+  document.getElementById('post-modal-title').textContent='Write a new post';
+  document.getElementById('post-title').value='';
+  document.getElementById('post-body').value='';
+  document.getElementById('post-cat').value='tech';
+  document.getElementById('post-err').style.display='none';
+  openModal('post-modal');
+}
+function openEditPost(id){
+  const p=state.posts.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('edit-post-id').value=id;
+  document.getElementById('post-modal-title').textContent='Edit post';
+  document.getElementById('post-title').value=p.title;
+  document.getElementById('post-body').value=p.body;
+  document.getElementById('post-cat').value=p.cat;
+  document.getElementById('post-err').style.display='none';
+  openModal('post-modal');
+}
+function savePost(){
+  const title=document.getElementById('post-title').value.trim();
+  const body=document.getElementById('post-body').value.trim();
+  const cat=document.getElementById('post-cat').value;
+  if(!title||!body){showErr('post-err','Please fill in the title and content.');return}
+  const editId=document.getElementById('edit-post-id').value;
+  if(editId){
+    const p=state.posts.find(x=>x.id===editId);
+    if(p){p.title=title;p.body=body;p.cat=cat}
+  } else {
+    state.posts.unshift({id:uid(),title,body,cat,author:state.currentUser.id,authorName:state.currentUser.name,ts:Date.now(),comments:[]});
+  }
+  closeModal('post-modal');
+  if(editId&&state.viewingPostId===editId){openPost(editId)}else{showFeed()}
+}
+function askDelete(id){
+  state.deletingPostId=id;
+  openModal('delete-modal');
+}
+function confirmDelete(){
+  state.posts=state.posts.filter(p=>p.id!==state.deletingPostId);
+  closeModal('delete-modal');
+  if(state.viewingPostId===state.deletingPostId){showFeed()}
+  else renderFeed();
+  state.deletingPostId=null;
+}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+// BOOT — go straight to feed as Alice (demo)
+loginUser(state.users[0]);
+</script>
+</body>
+</html>
